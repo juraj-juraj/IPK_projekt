@@ -264,15 +264,21 @@ int get_port(int count, char *str_number){
     return port_number;
 }
 
+string_t recvstring;
+int listenfd;
+
 void process_end(int signal){
+    str_destruct(&recvstring);
+    close(listenfd);
     exit(EXIT_SUCCESS);
 }
 
 int main(int argc, char *argv[]){
-    int listenfd, connfd, n;
+    int connfd, n;
+    //int listenfd, connfd, n;
     struct sockaddr_in servaddr;
     recvstate_t recv_state = None;
-    string_t recvstring;
+    //string_t recvstring;
     str_init(&recvstring);
 
     signal(SIGINT, process_end);
