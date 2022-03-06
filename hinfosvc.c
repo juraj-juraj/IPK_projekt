@@ -305,8 +305,8 @@ int main(int argc, char *argv[]){
 
         str_clear(&recvstring);
         while((n = read(connfd, STR_PTR(recvstring) , STR_SPACE(recvstring))) > 0){
-            printf(" ---------- \n");
-            //fprintf(stdout, "\n%s\n", recvstring.string);
+            // printf(" ---------- \n");
+            // fprintf(stdout, "\n%s\n", recvstring.string);
             recvstring.cursor += n;
             if(recvstring.cursor + 1 >= recvstring.length){
                 str_realloc(&recvstring);
