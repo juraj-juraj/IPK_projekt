@@ -14,6 +14,9 @@
 #include <signal.h>
 #include "str_obj.h"
 
+#define DEBUG 0
+
+// Defined buffer length for retrieving data from popen
 #define BUFF_LEN 4096
 #define SA struct sockaddr
 
@@ -242,10 +245,8 @@ void respond(int socket, recvstate_t r_type){
         write(socket, INTERNAL_ERROR, strlen(INTERNAL_ERROR));
         return;
     }
-    //printf("premenna v temp: %s \n", temp);
+    if(DEBUG) printf("premenna v temp: %s \n", temp);
     str_append(&message, temp, strlen(temp));
-    //str_append(&message, "\r\n", strlen("\r\n"));
-    //printf("premenna v stringu: %s", message.string);
     write(socket, (char *)message.string, message.cursor);
     free(temp);
     str_destruct(&message);
@@ -300,6 +301,7 @@ int main(int argc, char *argv[]){
     servaddr.sin_port = htons(server_port);
 
     if((bind(listenfd, (SA *)&servaddr, sizeof(servaddr))) < 0){
+        str_destruct(&recvstring);
         YIELD_ERROR;
     }
     if((listen(listenfd, 10)) < 0){
@@ -311,8 +313,7 @@ int main(int argc, char *argv[]){
 
         str_clear(&recvstring);
         while((n = read(connfd, STR_PTR(recvstring) , STR_SPACE(recvstring))) > 0){
-            // printf(" ---------- \n");
-            // fprintf(stdout, "\n%s\n", recvstring.string);
+            // fprintf(stdout, "-------------\n%s\n", recvstring.string);
             recvstring.cursor += n;
             if(recvstring.cursor + 1 >= recvstring.length){
                 str_realloc(&recvstring);
