@@ -14,7 +14,7 @@
 #include <signal.h>
 #include "str_obj.h"
 
-#define DEBUG 0
+#define DEBUG 1
 
 // Defined buffer length for retrieving data from popen
 #define BUFF_LEN 4096
@@ -97,14 +97,12 @@ char *get_cpu_name(){
     if(!cpu_file){
         return NULL;
     }
-    //fseek(cpu_file, 0L, SEEK_END);
     int length = BUFF_LEN;
-    //fseek(cpu_file, 0L, SEEK_SET);
     char *cpu_name = (char *) malloc(length);
     if(!cpu_name){
         return NULL;
     }
-    //skipping leanding spaces
+    //skipping leading spaces
     while((temp = fgetc(cpu_file)) == ' '){
         ;
     }
@@ -119,10 +117,10 @@ char *get_cpu_name(){
  * @return String with number reresenting utilization of CPU in %. It needs to be freed after use
  */
 char *get_cpu_load(){
-    FILE *cpu_file = popen(CPU_LOAD_COMMAND, "r");
     unsigned long int prev_idle, prev_non_idle, idle, non_idle;
-    unsigned long int prev_total, total, total_d, work_d;
+    unsigned long int prev_total, total, total_d, work_d, idle_d;
     double percentage;
+    FILE *cpu_file = popen(CPU_LOAD_COMMAND, "r");
     if(!cpu_file){
         return NULL;
     }
@@ -139,8 +137,10 @@ char *get_cpu_load(){
     idle = strtoul(cpu_load, NULL, BASE_10);
     fgets(cpu_load, length, cpu_file);
     non_idle = strtoul(cpu_load, NULL, BASE_10);
+    
     prev_total = prev_idle + prev_non_idle;
     total = idle + non_idle;
+    
     total_d = total - prev_total;
     work_d = non_idle - prev_non_idle;
     percentage = (float) work_d / total_d * 100;
@@ -150,7 +150,7 @@ char *get_cpu_load(){
 }
 
 /**
- * FSM to find begging of GET part of request from client. 
+ * FSM to find begining of GET part of request from client. 
  * @param string Message from client. Cursor in string structure will be set to beggining of GET
  * @return 1 if GET was resolved, 0 if not
  */
