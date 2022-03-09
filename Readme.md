@@ -45,5 +45,5 @@ Server potrebuje pri spustení parameter zadávajúci na akom porte má reagova�
 Po spustení servera reaguje na požiadavky:
 
 * <http://server:10800/hostname>
-* <http://server:10800/cpu-info>
+* <http://server:10800/cpu-name>
 * <http://server:10800/load>
