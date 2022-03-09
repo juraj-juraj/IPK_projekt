@@ -1,4 +1,7 @@
 *.txt
 *.sh
 *.zip
+*.o
+hinfosvc
+*.a
 IPK - Počítačové komunikace a sítě.pdf
