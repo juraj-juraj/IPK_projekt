@@ -93,7 +93,7 @@ char *get_hostname(){
  */
 char *get_cpu_name(){
     FILE *cpu_file = popen(CPU_NAME_COMMAND, "r");
-
+    char temp;
     if(!cpu_file){
         return NULL;
     }
@@ -104,8 +104,11 @@ char *get_cpu_name(){
     if(!cpu_name){
         return NULL;
     }
-    //TODO zrusit lepsie leading spaces;
-    fgetc(cpu_file);
+    //skipping leanding spaces
+    while((temp = fgetc(cpu_file)) == ' '){
+        ;
+    }
+    ungetc(temp, cpu_file);
     fgets(cpu_name, length, cpu_file);
     pclose(cpu_file);
     return cpu_name;
@@ -276,10 +279,8 @@ void process_end(int signal){
 
 int main(int argc, char *argv[]){
     int connfd, n;
-    //int listenfd, connfd, n;
     struct sockaddr_in servaddr;
     recvstate_t recv_state = None;
-    //string_t recvstring;
     str_init(&recvstring);
 
     signal(SIGINT, process_end);
@@ -297,7 +298,7 @@ int main(int argc, char *argv[]){
     servaddr.sin_family = AF_INET;
     //listening at any address
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    //listning only on selected port
+    //listening only on selected port
     servaddr.sin_port = htons(server_port);
 
     if((bind(listenfd, (SA *)&servaddr, sizeof(servaddr))) < 0){
@@ -308,12 +309,12 @@ int main(int argc, char *argv[]){
         YIELD_ERROR;
     }
     while(1){;
-        printf("waiting for connection on port %d \n", server_port);
+        if(DEBUG) printf("waiting for connection on port %d \n", server_port);
         connfd = accept(listenfd, (SA *) NULL, NULL);
 
         str_clear(&recvstring);
         while((n = read(connfd, STR_PTR(recvstring) , STR_SPACE(recvstring))) > 0){
-            // fprintf(stdout, "-------------\n%s\n", recvstring.string);
+            if(DEBUG) fprintf(stdout, "-------------\n%s\n", recvstring.string);
             recvstring.cursor += n;
             if(recvstring.cursor + 1 >= recvstring.length){
                 str_realloc(&recvstring);
