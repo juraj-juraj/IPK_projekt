@@ -9,7 +9,7 @@
 #define EXIT_FAILURE 
 
 
-#define INIT_STR_LEN 1000
+#define INIT_STR_LEN 32
 #define STR_REALLOC_CONST 2
 
 typedef enum string_word{
