@@ -1,6 +1,6 @@
 # Projekt Hinfosvc
 
-Utilita Hinfosvc umožnuje jednoducho získavať informácie o serveri, na ktorom beží. štatistiky možno získať cez webový prehliadač alebo v termináli. Funkcionalita zahŕňa zisťovanie hostname servera, názvu procesora a aktuálneho zaťaženie procesora.
+Utilita Hinfosvc umožnuje jednoducho získavať informácie o serveri, na ktorom beží. štatistiky možno získať cez webový prehliadač alebo v termináli. Funkcionalita zahŕňa zisťovanie hostname servera, názvu procesora a aktuálneho zaťaženia procesora.
 
 ## Súborová štruktúra
 
@@ -12,11 +12,11 @@ Tento súbor obsahuje zdrojový kód hlavnej časti programu. Obsluhuje sieťov�
 
 #### Získavanie parametrov
 
-Meno servera sa získava zo súboru /etc/hostname. Názov procesora sa získava zo súboru /proc/cpuinfo. Zaťaženie procesora sa získava zo súboru /proc/stat. Zo sekundovým rozdielom sa z neho vyčitajú údaje a na základe ich rozdielov sa dopočita zaťaženie.
+Meno servera sa získava zo súboru /etc/hostname. Názov procesora sa získava zo súboru /proc/cpuinfo. Zaťaženie procesora sa získava zo súboru /proc/stat. Zo sekundovým rozdielom sa z neho vyčitajú údaje a na základe ich rozdielov sa dopočíta zaťaženie. Parametre sa z daných súborov predspracujú a vyfiltrujú pomocou systémových utilít Linuxu. Program tak načitava do svojej pamäťe už predspracované dáta.
 
 ### Str_obj
 
-Knižnica na podporu práce s reťazcovými premennými. Umožnuje pracovať s reťazcami ako s premennou s dynamickou veľkosťou. Implementuje funkcie na prehľadávanie textu, jeho prechádzanie, spájenie reťazcov.
+Knižnica na podporu práce s reťazcovými premennými. Umožnuje pracovať s reťazcami ako s premennou s dynamickou veľkosťou. Implementuje funkcie na prehľadávanie textu, jeho prechádzanie, spájenie reťazcov a posun o slová. Ǔlohou tejto knižnice je abstrahovať prácu s reťazcami. Používa to hlavne obsluha prichádzajúceho, paketu keďže jeho veľkosť je dopredu neznáma.
 
 ## Kompilácia
 
@@ -44,6 +44,6 @@ Server potrebuje pri spustení parameter zadávajúci na akom porte má reagova�
 
 Po spustení servera reaguje na požiadavky:
 
-* <http://server:10800/hostname>
-* <http://server:10800/cpu-name>
-* <http://server:10800/load>
+* <http://server:port/hostname>
+* <http://server:port/cpu-name>
+* <http://server:port/load>
