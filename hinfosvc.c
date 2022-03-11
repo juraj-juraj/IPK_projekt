@@ -14,7 +14,7 @@
 #include <signal.h>
 #include "str_obj.h"
 
-#define DEBUG 1
+#define DEBUG 0
 
 // Defined buffer length for retrieving data from popen
 #define BUFF_LEN 4096
@@ -28,9 +28,9 @@
 #define HOST_PARAM "/hostname "
 #define CPU_NAME_PARAM "/cpu-name "
 #define LOAD_PARAM "/load "
-#define HTTP_HEAD "HTTP/1.0 200 OK \r\n\r\n"
-#define BAD_REQUEST "HTTP/1.0 400 Bad Request \r\n\r\n"
-#define INTERNAL_ERROR "HTTP/1.0 200 OK \r\n\r\nError on server side"
+#define HTTP_HEAD "HTTP/1.0 200 OK \r\n\r\nContent-Type: text/plain;\r\n\r\n"
+#define BAD_REQUEST "HTTP/1.0 400 Bad Request \r\n\r\nContent-Type: text/plain;\r\n\r\nBad request sent"
+#define INTERNAL_ERROR "HTTP/1.0 200 OK \r\n\r\nContent-Type: text/plain;\r\n\r\nError on server side"
 
 #define HOSTNAME_COMMAND "/etc/hostname"
 // retrieve command from cpuinfo file. Line with name and second collumn
