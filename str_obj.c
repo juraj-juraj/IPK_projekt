@@ -1,3 +1,9 @@
+/**
+ * @brief Implementation of library for working with strings. 
+ * @author Juraj Novosád(xnovos13)
+ * @file str_obj.c
+ */
+
 #include "str_obj.h"
 
 

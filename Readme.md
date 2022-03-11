@@ -49,3 +49,6 @@ Po spustení servera reaguje na požiadavky:
 * <http://server:port/load>
 
 Hostname vráti sieťové meno počítača. Cpu-name vráti meno procesora počítača. Load vráti aktuálne zaťaženie procesora v %.
+
+Autor: Juraj Novosád  
+email: xnovos13@stud.fit.vutbr.cz

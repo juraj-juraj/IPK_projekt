@@ -1,7 +1,7 @@
 /**
- * @brief Implementation of first asignment from subject IPK. 
+ * @brief Implementation of first assignment from subject IPK. 
  * @author Juraj Novosád(xnovos13)
- * @file hinfo.svc
+ * @file hinfosvc.c
  */
 
 
