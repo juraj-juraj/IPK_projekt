@@ -144,7 +144,7 @@ char *get_cpu_load(){
     total_d = total - prev_total;
     work_d = non_idle - prev_non_idle;
     percentage = (float) work_d / total_d * 100;
-    snprintf(cpu_load, length, "%f", percentage);
+    snprintf(cpu_load, length, "%f%%", percentage);
     pclose(cpu_file);
     return cpu_load;
 }
@@ -259,7 +259,7 @@ void respond(int socket, recvstate_t r_type){
 int get_port(int count, char *str_number){
     int port_number = 0;
     if(count != 2){
-        if(count < 2) errno = 1;
+        if(count < 2) errno = 6;
         else errno = 7;
     }
     else{
