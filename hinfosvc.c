@@ -14,7 +14,9 @@
 #include <signal.h>
 #include "str_obj.h"
 
-#define DEBUG 0
+#define DEBUG 1
+//I dont know why, it couldnt find it in correct header files. So defined it here
+#define SO_REUSEPORT 15
 
 // Defined buffer length for retrieving data from popen
 #define BUFF_LEN 4096
@@ -25,12 +27,13 @@
 
 #define YIELD_ERROR perror("ERROR");exit(EXIT_FAILURE);
 
+#define MAX_CLIENTS 3
 #define HOST_PARAM "/hostname "
 #define CPU_NAME_PARAM "/cpu-name "
 #define LOAD_PARAM "/load "
-#define HTTP_HEAD "HTTP/1.0 200 OK \r\n\r\nContent-Type: text/plain;\r\n\r\n"
-#define BAD_REQUEST "HTTP/1.0 400 Bad Request \r\n\r\nContent-Type: text/plain;\r\n\r\nBad request sent"
-#define INTERNAL_ERROR "HTTP/1.0 200 OK \r\n\r\nContent-Type: text/plain;\r\n\r\nError on server side"
+#define HTTP_HEAD "HTTP/1.0 200 OK \r\nContent-Type: text/plain\r\n\r\n"
+#define BAD_REQUEST "HTTP/1.0 400 Bad Request \r\nContent-Type: text/plain;\r\n\r\nBad request sent"
+#define INTERNAL_ERROR "HTTP/1.0 200 OK \r\nContent-Type: text/plain;\r\n\r\nError on server side"
 
 #define HOSTNAME_COMMAND "/etc/hostname"
 // retrieve command from cpuinfo file. Line with name and second collumn
@@ -281,6 +284,7 @@ int main(int argc, char *argv[]){
     int connfd, n;
     struct sockaddr_in servaddr;
     recvstate_t recv_state = None;
+
     str_init(&recvstring);
 
     signal(SIGINT, process_end);
@@ -294,6 +298,11 @@ int main(int argc, char *argv[]){
     if((listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
         YIELD_ERROR;
     }
+    int opt = 1;
+    if(setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))){
+        YIELD_ERROR;
+    }
+
     bzero(&servaddr, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
     //listening at any address
@@ -305,21 +314,25 @@ int main(int argc, char *argv[]){
         str_destruct(&recvstring);
         YIELD_ERROR;
     }
-    if((listen(listenfd, 10)) < 0){
+    if((listen(listenfd, MAX_CLIENTS)) < 0){
         YIELD_ERROR;
     }
     while(1){;
         if(DEBUG) printf("waiting for connection on port %d \n", server_port);
         connfd = accept(listenfd, (SA *) NULL, NULL);
 
+        printf("prva\n");
+
         str_clear(&recvstring);
         while((n = read(connfd, STR_PTR(recvstring) , STR_SPACE(recvstring))) > 0){
+            printf("druha ----------------------------\n");
             if(DEBUG) fprintf(stdout, "-------------\n%s\n", recvstring.string);
             recvstring.cursor += n;
             if(recvstring.cursor + 1 >= recvstring.length){
                 str_realloc(&recvstring);
                 continue;
             }
+            printf("last_char: %d\n", (int) recvstring.string[recvstring.cursor-1]);
             if(recvstring.string[recvstring.cursor-1] == '\n'){
                 break;
             }
@@ -327,6 +340,7 @@ int main(int argc, char *argv[]){
         if(n < 0){
             YIELD_ERROR;
         }
+        printf("stvrte\n");
         recv_state = decode_request(&recvstring);
         respond(connfd, recv_state);
         close(connfd);
