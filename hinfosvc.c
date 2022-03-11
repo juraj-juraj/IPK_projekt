@@ -12,9 +12,10 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <poll.h>
 #include "str_obj.h"
 
-#define DEBUG 1
+#define DEBUG 0
 //I dont know why, it couldnt find it in correct header files. So defined it here
 #define SO_REUSEPORT 15
 
@@ -28,6 +29,7 @@
 #define YIELD_ERROR perror("ERROR");exit(EXIT_FAILURE);
 
 #define MAX_CLIENTS 3
+#define TIMEOUT_CONNECT 200
 #define HOST_PARAM "/hostname "
 #define CPU_NAME_PARAM "/cpu-name "
 #define LOAD_PARAM "/load "
@@ -273,10 +275,12 @@ int get_port(int count, char *str_number){
 
 string_t recvstring;
 int listenfd;
+struct pollfd *pfds;
 
 void process_end(int signal){
     str_destruct(&recvstring);
     close(listenfd);
+    free(pfds);
     exit(EXIT_SUCCESS);
 }
 
@@ -317,22 +321,32 @@ int main(int argc, char *argv[]){
     if((listen(listenfd, MAX_CLIENTS)) < 0){
         YIELD_ERROR;
     }
+    
+    int nfds = 1; 
+    pfds = calloc(nfds, sizeof(struct pollfd));
+    if(pfds == NULL){
+        YIELD_ERROR;
+    }
+
     while(1){;
         if(DEBUG) printf("waiting for connection on port %d \n", server_port);
         connfd = accept(listenfd, (SA *) NULL, NULL);
 
-        printf("prva\n");
+        pfds[0].fd = connfd;
+        pfds[0].events = POLLIN;
+        if(!poll(pfds, nfds, TIMEOUT_CONNECT)){
+            continue;
+        }
 
         str_clear(&recvstring);
         while((n = read(connfd, STR_PTR(recvstring) , STR_SPACE(recvstring))) > 0){
-            printf("druha ----------------------------\n");
             if(DEBUG) fprintf(stdout, "-------------\n%s\n", recvstring.string);
             recvstring.cursor += n;
             if(recvstring.cursor + 1 >= recvstring.length){
                 str_realloc(&recvstring);
                 continue;
             }
-            printf("last_char: %d\n", (int) recvstring.string[recvstring.cursor-1]);
+            if(DEBUG) printf("last_char: %d\n", (int) recvstring.string[recvstring.cursor-1]);
             if(recvstring.string[recvstring.cursor-1] == '\n'){
                 break;
             }
@@ -340,7 +354,6 @@ int main(int argc, char *argv[]){
         if(n < 0){
             YIELD_ERROR;
         }
-        printf("stvrte\n");
         recv_state = decode_request(&recvstring);
         respond(connfd, recv_state);
         close(connfd);
