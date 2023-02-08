@@ -5,8 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define EXIT_SUCCESS 0
-#define EXIT_FAILURE 
+
 
 
 #define INIT_STR_LEN 32

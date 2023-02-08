@@ -64,7 +64,7 @@ int str_print_word(string_t *string){
                     break;
                 }
                 state = Word;
-                //falltrough
+                //fallthrough
             case Word:
                 if(is_space(string->string[i])){
                     putchar('\n');
@@ -72,13 +72,15 @@ int str_print_word(string_t *string){
                 }
                 putchar(string->string[i]);
                 break;
+            case End:
+                break;
         }
     }
     return EXIT_FAILURE;
 }
 
 int str_start_with(string_t *string, char *start, int start_len){
-    if(start_len > strlen(string->string)){
+    if(((size_t) start_len) > strlen(string->string)){
         return 0;
     }
     for(int i=0; i < start_len ; i++){

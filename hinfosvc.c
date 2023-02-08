@@ -3,9 +3,11 @@
  * @author Juraj Novosád(xnovos13)
  * @file hinfosvc.c
  */
-
+// prevzate z https://mobile.zandronum.com/tracker/print_bug_page.php?bug_id=3504&fbclid=IwAR1sjddQ1-xF5FQDsjJd1iQNtEm1qW8Y8DcWexb35jFZcZp2Y8YO-zkWFGk
+#define _XOPEN_SOURCE 700
 
 #include <stdio.h>
+
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -15,6 +17,7 @@
 #include <poll.h>
 #include "str_obj.h"
 
+
 #define DEBUG 0
 //I dont know why, it couldnt find it in correct header files. So defined it here
 #define SO_REUSEPORT 15
@@ -23,8 +26,7 @@
 #define BUFF_LEN 4096
 #define SA struct sockaddr
 
-#define EXIT_SUCCESS 0
-#define EXIT_FAILURE 1
+
 
 #define YIELD_ERROR perror("ERROR");exit(EXIT_FAILURE);
 
@@ -123,7 +125,7 @@ char *get_cpu_name(){
  */
 char *get_cpu_load(){
     unsigned long int prev_idle, prev_non_idle, idle, non_idle;
-    unsigned long int prev_total, total, total_d, work_d, idle_d;
+    unsigned long int prev_total, total, total_d, work_d;
     double percentage;
     FILE *cpu_file = popen(CPU_LOAD_COMMAND, "r");
     if(!cpu_file){
@@ -229,7 +231,6 @@ recvstate_t decode_request(string_t *string){
  * @param type what client requested
  */
 void respond(int socket, recvstate_t r_type){
-    int retval = 0;
     char *temp = NULL;
     string_t message;
     str_init(&message);
@@ -258,7 +259,7 @@ void respond(int socket, recvstate_t r_type){
     write(socket, (char *)message.string, message.cursor);
     free(temp);
     str_destruct(&message);
-    return retval;
+    return;
 }
 
 int get_port(int count, char *str_number){
@@ -278,9 +279,11 @@ int listenfd;
 struct pollfd *pfds;
 
 void process_end(int signal){
-    str_destruct(&recvstring);
-    close(listenfd);
-    free(pfds);
+    if(signal == SIGINT){
+        str_destruct(&recvstring);
+        close(listenfd);
+        free(pfds);
+        }
     exit(EXIT_SUCCESS);
 }
 
