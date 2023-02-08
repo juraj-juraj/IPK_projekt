@@ -2,7 +2,7 @@ MAIN_PROG=hinfosvc
 NAME=xnovos13
 
 CC=gcc
-CFLAGS= -std=c99 -Wall -Wextra -pedantic -w -g -fcommon
+CFLAGS= -std=c99 -Wall -Wextra -pedantic -g -fcommon
 STR_DEPS= str_obj
 .PHONY=clean, zip
 
